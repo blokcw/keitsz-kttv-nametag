@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="KTTV製作中心">
-<meta name="kttv-version" content="2026.10.07-1414">
+<meta name="kttv-version" content="2026.10.08-1948">
 <title>KTTV前後期製作中心</title>
 <link rel="icon" data-logo>
 <link rel="apple-touch-icon" data-logo>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Iansui&family=Chiron+Sung+HK:wght@500;900&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Barlow+Condensed:wght@600;700&family=Share+Tech+Mono&family=Noto+Serif+TC:wght@400;700;900&family=Chiron+Hei+HK:wght@400;700;900&family=LXGW+WenKai+TC:wght@400;700&family=Bebas+Neue&display=swap">
 <style>
 /* Layout: 16:9 live preview stage on top, control panel below in wrapping columns, result sheet after export. */
@@ -66,6 +67,11 @@ input[type=text]:focus, select:focus, button:focus-visible { outline: 2px solid 
 .seg.grid button:nth-child(4n) { border-right: 0 }
 .seg.grid button:nth-last-child(-n+3) { border-bottom: 0 }
 .seg .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: 0; box-shadow: 0 0 0 1px rgba(0,0,0,.25) }
+.fontpick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px }
+.fontpick button { font: inherit; display: grid; gap: 0; justify-items: center; padding: 8px 4px 6px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--field); color: var(--fg); cursor: pointer; min-width: 0 }
+.fontpick b { font-size: 22px; line-height: 1.3; white-space: nowrap }
+.fontpick span { font-size: 12px; color: var(--muted); font-weight: 500 }
+.fontpick button[aria-pressed=true] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); background: var(--panel) }
 .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px }
 .ico { position: relative; border: 1px solid var(--line); border-radius: 9px; background: var(--field); padding: 6px 6px 4px; cursor: pointer; display: grid; gap: 3px; justify-items: center; font: inherit; color: var(--fg); min-width: 0 }
 .ico[aria-pressed=true] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) }
@@ -596,6 +602,15 @@ footer.credit { padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 22px) }
 .gr-stage.refmode { display: flex; gap: 4px; justify-content: center; align-items: center }
 .gr-stage.refmode canvas { width: calc(50% - 2px); max-width: calc(50% - 2px); height: auto; max-height: 70vh; object-fit: contain }
 
+.gr-dir { padding: 6px 12px; font-size: 14px; gap: 6px; white-space: nowrap }
+.gr-dir i { font-style: normal; font-size: 16px }
+.gr-dir[aria-pressed=true] { background: var(--accent); color: var(--accent-fg) }
+.gr-split.v { width: auto; height: 34px; margin-left: 0; margin-top: -17px; cursor: ns-resize }
+.gr-split.v::before { top: 16px; bottom: auto; left: 0; right: 0; width: auto; height: 2px }
+.gr-stage.refmode.vert { flex-direction: column }
+.gr-stage.refmode.vert canvas { width: auto; max-width: 100%; height: auto; max-height: calc(35vh - 2px) }
+.gr-stage.vert canvas { max-height: 70vh }
+
 /* =========================================================
    KTTV theme — "crew room": crest navy, tally red, gaffer tape
    ========================================================= */
@@ -751,6 +766,14 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
   .tally { animation: none }
   .tool:active .tool-art, .btn:active { transform: none }
 }
+
+/* English subtitles on the home page */
+.tool-en, .stage-en, .home-en { display: block; font-family: var(--f-tag); font-weight: 600; letter-spacing: .02em; line-height: 1.2 }
+.tool-en { margin-top: 2px; font-size: 16px; color: var(--muted) }
+.stage-row.solo .tool-en { font-size: 18px }
+.stage-en { font-size: 15px; color: var(--muted); margin-top: -2px }
+.home-en { margin: 6px 0 0; font-size: clamp(18px, 2.4vw, 24px); color: rgba(255,255,255,.72) }
+@media (max-width: 1000px) { .stage-en { margin-top: 0 } }
 </style>
 </head>
 <body>
@@ -836,6 +859,16 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
           <button type="button" data-v="easter" aria-pressed="false"><i class="sw" style="background:#8e6cc9"></i>復活節</button>
         </div>
       </div>
+      <div class="f">字體
+        <div class="fontpick" id="fontSeg" role="group" aria-label="名字字體">
+          <button type="button" data-v="noto" aria-pressed="true"><b style="font-family:'Noto Sans TC',sans-serif;font-weight:900">陳小明</b><span>思源黑體</span></button>
+          <button type="button" data-v="chiron" aria-pressed="false"><b style="font-family:'Chiron Hei HK','Noto Sans TC',sans-serif;font-weight:900">陳小明</b><span>昭源黑體</span></button>
+          <button type="button" data-v="sung" aria-pressed="false"><b style="font-family:'Chiron Sung HK','Noto Serif TC',serif;font-weight:900">陳小明</b><span>昭源宋體</span></button>
+          <button type="button" data-v="kai" aria-pressed="false"><b style="font-family:'LXGW WenKai TC',serif;font-weight:700">陳小明</b><span>楷書</span></button>
+          <button type="button" data-v="round" aria-pressed="false"><b style="font-family:'Huninn','Noto Sans TC',sans-serif;font-weight:400">陳小明</b><span>粉圓體</span></button>
+          <button type="button" data-v="hand" aria-pressed="false"><b style="font-family:'Iansui','LXGW WenKai TC',sans-serif;font-weight:400">陳小明</b><span>芫荽手寫</span></button>
+        </div>
+      </div>
       <div class="f">位置
         <div class="seg" id="posSeg">
           <button type="button" data-v="left" aria-pressed="true">左下</button>
@@ -894,6 +927,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
       <div class="home-ttl">
         <p class="home-kicker"><span class="tally" aria-hidden="true"></span>基慈小學校園電視台</p>
         <h1>KTTV前後期製作中心</h1>
+        <p class="home-en" lang="en">KTTV Production Centre</p>
         <p class="home-sub">由寫稿、開機到剪片加字，製作一集節目要用嘅工具都喺度。</p>
         <div class="hero-links"><a href="#guide" class="hero-link">功能總覽及說明</a><button type="button" class="hero-link ghost" id="newsBtn">最新功能</button></div>
       </div>
@@ -902,14 +936,14 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
 
   <div class="home-body">
     <section class="stage-row solo" aria-labelledby="st-pre">
-      <div class="stage-head"><h2 class="tape" id="st-pre">前期</h2><p>開拍之前：寫好講稿，練習讀幾耐。</p></div>
+      <div class="stage-head"><h2 class="tape" id="st-pre">前期</h2><span class="stage-en" lang="en">Pre-production</span><p>開拍之前：寫好講稿，練習讀幾耐。</p></div>
       <div class="tools">
         <a class="tool" href="#prompter">
           <span class="tool-art art-prompter" aria-hidden="true">
             <span class="ap-line">各位同學早晨！</span><span class="ap-line ap-now">歡迎收看今日嘅</span><span class="ap-line">基慈校園電視台。</span>
           </span>
           <span class="tool-txt">
-            <span class="tool-name">提詞機</span>
+            <span class="tool-name">提詞機<span class="tool-en" lang="en">Teleprompter</span></span>
             <span class="tool-desc">貼上講稿，自動估算讀稿時間；鏡像 / 上下翻轉、可調速度、大字黃字黑底，主播望住鏡頭都讀到。</span>
           </span>
         </a>
@@ -917,7 +951,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
     </section>
 
     <section class="stage-row" aria-labelledby="st-shoot">
-      <div class="stage-head"><h2 class="tape" id="st-shoot">拍攝</h2><p>開機拍攝：打板、提醒外面唔好嘈。</p></div>
+      <div class="stage-head"><h2 class="tape" id="st-shoot">拍攝</h2><span class="stage-en" lang="en">Production</span><p>開機拍攝：打板、提醒外面唔好嘈。</p></div>
       <div class="tools">
         <a class="tool" href="#slate">
           <span class="tool-art art-slate" aria-hidden="true">
@@ -925,14 +959,14 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
             <span class="as-body"><span><i>SCENE</i>3A</span><span><i>TAKE</i>4</span><span class="as-tc">10:24:08:12</span></span>
           </span>
           <span class="tool-txt">
-            <span class="tool-name">電子場記板</span>
+            <span class="tool-name">電子場記板<span class="tool-en" lang="en">Digital slate</span></span>
             <span class="tool-desc">大字顯示場次、Take、機位同日期。一按 CLAP：白閃加 1kHz 嗶聲做同步點，Take 自動加 1。</span>
           </span>
         </a>
         <a class="tool" href="#sign">
           <span class="tool-art art-sign" aria-hidden="true"><span class="asg-lamp">拍攝中</span><span class="asg-sub">請保持安靜・請勿進入</span></span>
           <span class="tool-txt">
-            <span class="tool-name">拍攝中告示</span>
+            <span class="tool-name">拍攝中告示<span class="tool-en" lang="en">On-set sign</span></span>
             <span class="tool-desc">全螢幕亮燈告示，放喺課室門口，提醒外面嘅人唔好嘈、唔好入嚟。</span>
           </span>
         </a>
@@ -940,7 +974,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
     </section>
 
     <section class="stage-row" aria-labelledby="st-post">
-      <div class="stage-head"><h2 class="tape" id="st-post">後期</h2><p>剪片之前：整好字幕、標題，再調色。</p></div>
+      <div class="stage-head"><h2 class="tape" id="st-post">後期</h2><span class="stage-en" lang="en">Post-production</span><p>剪片之前：整好字幕、標題，再調色。</p></div>
       <div class="tools three">
         <a class="tool" href="#nametag">
           <span class="tool-art art-nametag" aria-hidden="true">
@@ -948,7 +982,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
             <span class="an-bars"><span class="an-tag">基慈校園電視台</span><span class="an-name">陳小明</span><span class="an-role">校園電視台主播</span></span>
           </span>
           <span class="tool-txt">
-            <span class="tool-name">人名字幕條</span>
+            <span class="tool-name">人名字幕條<span class="tool-en" lang="en">Name lower thirds</span></span>
             <span class="tool-desc">輸入名字同身份，揀節日主題同圖示，錄成綠幕影片，放入剪片軟件疊喺畫面上。</span>
           </span>
         </a>
@@ -959,14 +993,14 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
             <span class="at-safe"></span>
           </span>
           <span class="tool-txt">
-            <span class="tool-name">標題角標</span>
+            <span class="tool-name">標題角標<span class="tool-en" lang="en">Titles &amp; corner bugs</span></span>
             <span class="tool-desc">節目標題、四角 Logo、下方字幕：自由拖放或者用預設位置，調字體、大小、顏色，匯出透明 PNG。</span>
           </span>
         </a>
         <a class="tool" href="#grade">
           <span class="tool-art art-grade" aria-hidden="true"><span class="ag-sun"></span><span class="ag-k">⇆</span><span class="ag-l a">原圖</span><span class="ag-l b">調色後</span></span>
           <span class="tool-txt">
-            <span class="tool-name">調色室</span>
+            <span class="tool-name">調色室<span class="tool-en" lang="en">Colour grading</span></span>
             <span class="tool-desc">相片同影片調曝光、色溫，套用 LUT，或者跟參考相片一鍵配色；分割畫面即時比較。</span>
           </span>
         </a>
@@ -974,7 +1008,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
     </section>
 
     <section class="stage-row solo util" aria-labelledby="st-tools">
-      <div class="stage-head"><h2 class="tape navy" id="st-tools">工具</h2><p>隨時用：轉格式、壓縮、剪接。</p></div>
+      <div class="stage-head"><h2 class="tape navy" id="st-tools">工具</h2><span class="stage-en" lang="en">Tools</span><p>隨時用：轉格式、壓縮、剪接。</p></div>
       <div class="tools">
         <a class="tool" href="#convert">
           <span class="tool-art art-conv" aria-hidden="true">
@@ -984,7 +1018,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
             <span class="ac-row"><i>PDF</i><b>›</b><i class="on">DOCX</i></span>
           </span>
           <span class="tool-txt">
-            <span class="tool-name">檔案轉換</span>
+            <span class="tool-name">檔案轉換<span class="tool-en" lang="en">File converter</span></span>
             <span class="tool-desc">影片、音訊、圖片、PDF 轉格式同壓縮；剪接、合併、媒體資訊、修復。批次隊列，全部喺部機處理，唔會上載。</span>
           </span>
         </a>
@@ -1347,7 +1381,10 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
                 <option value="Noto Sans TC">思源黑體</option>
                 <option value="Noto Serif TC">思源宋體</option>
                 <option value="Chiron Hei HK">昭源黑體（港式）</option>
+                <option value="Chiron Sung HK">昭源宋體（港式）</option>
                 <option value="LXGW WenKai TC">霞鶩文楷</option>
+                <option value="Huninn">粉圓體（圓體）</option>
+                <option value="Iansui">芫荽（手寫）</option>
                 <option value="Bebas Neue">Bebas Neue（英文標題）</option>
                 <option value="Barlow Condensed">Barlow Condensed（英文窄體）</option>
               </select>
@@ -1663,6 +1700,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
               <button type="button" data-v="after" aria-pressed="false">只睇結果</button>
               <button type="button" data-v="ref" aria-pressed="false" id="grViewRef" hidden>對照參考</button>
             </div>
+            <button type="button" class="btn ghost gr-dir" id="grDir" aria-pressed="false" aria-label="比較方向：左右或者上下" title="切換左右 / 上下比較"><i aria-hidden="true">⇆</i><span>左右</span></button>
             <button type="button" class="btn ghost gr-hold" id="grHold">按住睇原圖</button>
             <span class="gr-fname" id="grFName"></span>
             <button type="button" class="chip" id="grChange">換檔案</button>
@@ -1745,7 +1783,7 @@ input[type=text], select, .cv-form input[type=number], .cv-form input[type=passw
     <li>拖放或者揀一張相片 / 一段影片（MP4、MOV、WebM）。冇素材可以撳「用示範相片試吓」。</li>
     <li>喺「調色」調整：<b>曝光</b>（成張相變光變暗）、<b>亮度</b>（中間調）、<b>對比</b>、<b>高光</b>、<b>陰影</b>、<b>色溫</b>、<b>色調</b>、<b>飽和度</b>、<b>自然飽和度</b>、<b>褪色</b>。雙擊滑桿可以重設。</li>
     <li>喺「LUT 風格」揀內置風格（電影感、日系、黑白等），或者上載自己嘅 <b>.cube</b> 檔案，再用「LUT 強度」調深淺。</li>
-    <li>比較：「分割」拖動中間條線；「並排」左右對比；長按「按住睇原圖」快速比較。</li>
+    <li>比較：「分割」拖動中間條線；「並排」兩幅一齊睇；撳「左右 / 上下」切換比較方向（直身片或者 iPhone 直放時用「上下」更清楚）；長按「按住睇原圖」快速比較。</li>
     <li><b>參考配色</b>：喺「參考配色」上載一張想要嘅色調（電影截圖、上一集嘅畫面），撳「一鍵套用參考色調」。用「對照參考」並排睇參考同結果；「跟光暗」「跟顏色」調深淺。直方圖嘅白色虛線就係參考嘅光暗分佈。</li>
     <li>撳「下載調色結果」。相片會用原本解像度匯出；影片會優先用硬件編碼，聲音會保留。</li>
   </ol>
@@ -1776,8 +1814,23 @@ const THEMES = {
   easter: { main: "#8e6cc9", mainText: "#ffffff", sub: "#fff6d6", subText: "#5b3f8f", red: "#f28fb0", block: "#ffffff", wave: "#bfe8c6" }
 };
 const BGS = { green: "#00b140", blue: "#0047bb", black: "#000000", alpha: null };
-const FONT = '"Noto Sans TC", "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif';
-const TAGFONT = '"Barlow Condensed", "Noto Sans TC", "PingFang TC", sans-serif';
+const FB = '"PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif';
+// fonts for the name and role lines: family, [name weight, role weight]
+const NT_FONTS = {
+  noto:   { fam: '"Noto Sans TC", ' + FB, w: [900, 500] },
+  chiron: { fam: '"Chiron Hei HK", "Noto Sans TC", ' + FB, w: [900, 500] },
+  sung:   { fam: '"Chiron Sung HK", "Noto Serif TC", "Songti TC", serif', w: [900, 500] },
+  kai:    { fam: '"LXGW WenKai TC", "Kaiti TC", "BiauKai", serif', w: [700, 400] },
+  round:  { fam: '"Huninn", "Noto Sans TC", ' + FB, w: [400, 400] },
+  hand:   { fam: '"Iansui", "LXGW WenKai TC", ' + FB, w: [400, 400] }
+};
+const nf = () => NT_FONTS[cfg.font] || NT_FONTS.noto;
+const tagFont = () => '"Barlow Condensed", ' + nf().fam;
+function loadNtFont() {
+  if (!document.fonts || !document.fonts.load) return Promise.resolve();
+  const f = nf(), txt = (cfg.name || "") + (cfg.role || "") + (cfg.tag || "") + "陳小明主播";
+  return Promise.all([document.fonts.load(`${f.w[0]} 78px ${f.fam}`, txt), document.fonts.load(`${f.w[1]} 36px ${f.fam}`, txt)]).catch(() => {});
+}
 
 const $ = id => document.getElementById(id);
 const stage = $("stage"), sctx = stage.getContext("2d");
@@ -1791,7 +1844,7 @@ const ua = navigator.userAgent;
 const isIOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const isChromium = !!(navigator.userAgentData && navigator.userAgentData.brands && navigator.userAgentData.brands.some(b => /Chromium|Google Chrome|Microsoft Edge/.test(b.brand)));
 
-const cfg = { name: "", role: "", tag: "", theme: "school", pos: "left", hold: 4, scale: 1, showLogo: true, showDot: true, showPattern: true, bg: "green", res: "1080", iconId: "crest", fit: "contain" };
+const cfg = { name: "", role: "", tag: "", font: "noto", theme: "school", pos: "left", hold: 4, scale: 1, showLogo: true, showDot: true, showPattern: true, bg: "green", res: "1080", iconId: "crest", fit: "contain" };
 const total = () => IN + cfg.hold + OUT;
 
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
@@ -1831,8 +1884,9 @@ function drawLowerThird(c, t) {
   if (cfg.pos === "right") c.scale(-1, 1);
 
   const nameSize = 78, roleSize = 36, tagSize = 30;
-  c.font = `900 ${nameSize}px ${FONT}`; const nameW = Math.max(c.measureText(cfg.name || " ").width, 160);
-  c.font = `500 ${roleSize}px ${FONT}`; const roleW = c.measureText(cfg.role || " ").width;
+  const NF = nf(), FONT = NF.fam, TAGFONT = tagFont(), WN = NF.w[0], WR = NF.w[1];
+  c.font = `${WN} ${nameSize}px ${FONT}`; const nameW = Math.max(c.measureText(cfg.name || " ").width, 160);
+  c.font = `${WR} ${roleSize}px ${FONT}`; const roleW = c.measureText(cfg.role || " ").width;
   c.font = `700 ${tagSize}px ${TAGFONT}`; const tagW = cfg.tag ? c.measureText(cfg.tag).width : 0;
 
   const icon = currentIcon();
@@ -1915,7 +1969,7 @@ function drawLowerThird(c, t) {
   if (pNameTxt > 0 && nbw > 1) {
     c.save(); c.beginPath(); c.rect(xBars, yName, nbw, nameH); c.clip();
     if (R) c.scale(-1, 1);
-    c.fillStyle = th.mainText; c.font = `900 ${nameSize}px ${FONT}`; c.textBaseline = "middle";
+    c.fillStyle = th.mainText; c.font = `${WN} ${nameSize}px ${FONT}`; c.textBaseline = "middle";
     const tx = 52, ty = yName + nameH / 2 - 4 + (1 - pNameTxt) * 70;
     c.textAlign = R ? "right" : "left";
     c.fillText(cfg.name, R ? -(xBars + tx) : xBars + tx, ty);
@@ -1924,7 +1978,7 @@ function drawLowerThird(c, t) {
   if (pSubTxt > 0 && sbw > 1) {
     c.save(); c.beginPath(); c.rect(xBars, ySub, sbw, subH); c.clip();
     if (R) c.scale(-1, 1);
-    c.globalAlpha = pSubTxt; c.fillStyle = th.subText; c.font = `500 ${roleSize}px ${FONT}`; c.textBaseline = "middle";
+    c.globalAlpha = pSubTxt; c.fillStyle = th.subText; c.font = `${WR} ${roleSize}px ${FONT}`; c.textBaseline = "middle";
     const tx = 40 - (1 - pSubTxt) * 24, ty = ySub + subH / 2 + 1;
     c.textAlign = R ? "right" : "left";
     c.fillText(cfg.role, R ? -(xBars + tx) : xBars + tx, ty);
@@ -2273,10 +2327,11 @@ function writeForm() {
   $("hold").value = String(cfg.hold); $("scale").value = String(cfg.scale);
   $("showLogo").checked = cfg.showLogo; $("showDot").checked = cfg.showDot; $("showPattern").checked = cfg.showPattern !== false;
   $("bg").value = cfg.bg; $("res").value = cfg.res;
-  setSeg("themeSeg", cfg.theme); setSeg("posSeg", cfg.pos); setSeg("fitSeg", cfg.fit);
+  setSeg("themeSeg", cfg.theme); setSeg("fontSeg", cfg.font || "noto"); setSeg("posSeg", cfg.pos); setSeg("fitSeg", cfg.fit);
 }
 function bindSeg(id, key) { $(id).addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; cfg[key] = b.dataset.v; setSeg(id, b.dataset.v); save(); }); }
-bindSeg("themeSeg", "theme"); bindSeg("posSeg", "pos"); bindSeg("fitSeg", "fit");
+bindSeg("themeSeg", "theme"); bindSeg("fontSeg", "font"); bindSeg("posSeg", "pos");
+$("fontSeg").addEventListener("click", () => loadNtFont()); bindSeg("fitSeg", "fit");
 $("form").addEventListener("input", () => readForm());
 $("form").addEventListener("change", () => readForm());
 document.querySelectorAll(".chip").forEach(ch => ch.onclick = () => { $("role").value = ch.dataset.role; readForm(); });
@@ -2348,7 +2403,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden && abo
 $("exportBtn").onclick = async () => {
   if (recording) return;
   readForm();
-  try { await document.fonts.ready; } catch (e) {}
+  await loadNtFont(); try { await document.fonts.ready; } catch (e) {}
   const alpha = cfg.bg === "alpha";
   const fmt = pickMime(alpha);
   if (!fmt || !stage.captureStream) { say("呢個瀏覽器錄唔到影片。請用 Safari（iPad / iPhone / Mac）或者 Chrome。", true); return; }
@@ -2414,7 +2469,7 @@ $("exportBtn").onclick = async () => {
 };
 
 $("pngBtn").onclick = async () => {
-  readForm(); try { await document.fonts.ready; } catch (e) {}
+  readForm(); await loadNtFont(); try { await document.fonts.ready; } catch (e) {}
   const pc = document.createElement("canvas"); pc.width = 1920; pc.height = 1080;
   compose(pc.getContext("2d"), IN + 0.6, null);
   pc.toBlob(b => {
@@ -2431,6 +2486,7 @@ if (document.fonts && document.fonts.load) {
   document.fonts.load(`500 36px "Noto Sans TC"`).catch(() => {});
   document.fonts.load(`700 30px "Barlow Condensed"`).catch(() => {});
 }
+loadNtFont();
 requestAnimationFrame(tick);
 })();
 </script>
@@ -3017,7 +3073,7 @@ Thank you for watching. 我哋下星期再見！`;
   const USES = { "16:9": "YouTube、電視、投影", "9:16": "IG Reels、YouTube Shorts、抖音", "4:3": "iPad、舊式電視", "3:4": "直向 iPad", "3:2": "相機相片", "2:3": "直向相片", "5:4": "相片、展板", "4:5": "IG 直向帖文", "1:1": "IG 方形帖文" };
   let W = 1920, H = 1080;
   const FONTS = { "Noto Sans TC": '"Noto Sans TC", "PingFang TC", sans-serif', "Noto Serif TC": '"Noto Serif TC", "Songti TC", serif',
-    "Chiron Hei HK": '"Chiron Hei HK", "Noto Sans TC", "PingFang TC", sans-serif', "LXGW WenKai TC": '"LXGW WenKai TC", "Kaiti TC", serif',
+    "Chiron Hei HK": '"Chiron Hei HK", "Noto Sans TC", "PingFang TC", sans-serif', "LXGW WenKai TC": '"LXGW WenKai TC", "Kaiti TC", serif', "Chiron Sung HK": '"Chiron Sung HK", "Noto Serif TC", "Songti TC", serif', "Huninn": '"Huninn", "Noto Sans TC", "PingFang TC", sans-serif', "Iansui": '"Iansui", "LXGW WenKai TC", "PingFang TC", sans-serif',
     "Bebas Neue": '"Bebas Neue", "Barlow Condensed", "Noto Sans TC", sans-serif', "Barlow Condensed": '"Barlow Condensed", "Noto Sans TC", sans-serif' };
   const SW = ["#ffffff", "#000000", "#352677", "#d23330", "#ffd400", "#c9a24a", "#1f9d55", "#4aa8ff"];
   const uid = () => "L" + Math.random().toString(36).slice(2, 9);
@@ -3492,6 +3548,11 @@ Thank you for watching. 我哋下星期再見！`;
   const $ = id => document.getElementById(id);
   // newest first; bump RELEASE notes here whenever a feature ships
   const RELEASES = [
+    { v: "1.10", date: "2026-10-08", title: "上下比較、字幕字體", items: [
+      "<b>調色室</b>：新增「左右 / 上下」切換，分割、並排同對照參考都可以改做上下比較，直身片更清楚。",
+      "<b>人名字幕條可以揀字體</b>：思源黑體、昭源黑體、昭源宋體、楷書、粉圓體、芫荽手寫；標題角標都加咗呢幾款字體。",
+      "<b>檔案轉換</b>：重寫影音轉換引擎嘅載入方式，iPad / iPhone / Safari 都用得；學校網絡擋咗主伺服器時會自動改用後備伺服器。",
+      "主頁每個工具名稱下面加咗英文名。" ] },
     { v: "1.9", date: "2026-10-07", title: "全新介面", items: [
       "<b>主頁重新設計</b>：工具按製作流程排好——前期、拍攝、後期，另加實用工具，一眼搵到要用邊個。",
       "各工具頁面統一新樣式：標題更大更清楚，設定分組用「膠紙標籤」標示，iPad 上更易撳。",
@@ -3666,22 +3727,117 @@ function engineUI(state, text) {
   $("cvEngTxt").textContent = text;
   $("cvEngLoad").hidden = state === "ready" || state === "loading";
 }
+// Our own small driver for ffmpeg-core (UMD build) running in a CLASSIC worker made from a blob.
+// Classic workers + importScripts work on every Safari / iPadOS version that has WebAssembly,
+// unlike module workers and cross-origin import() (which older Safari blocks).
+const FF_CORE_VER = "0.12.10";
+const FF_MIRRORS = [
+  "https://cdn.jsdelivr.net/npm/@ffmpeg/core@" + FF_CORE_VER + "/dist/umd/",
+  "https://unpkg.com/@ffmpeg/core@" + FF_CORE_VER + "/dist/umd/"
+];
+const FF_WORKER_SRC = `
+let ffmpeg = null;
+const post = (m, t) => self.postMessage(m, t || []);
+self.onmessage = async (ev) => {
+  const { id, type, data } = ev.data || {};
+  try {
+    let r = true;
+    if (type !== "LOAD" && !ffmpeg) throw new Error("engine not loaded");
+    switch (type) {
+      case "LOAD": {
+        importScripts(data.coreURL);
+        if (typeof self.createFFmpegCore !== "function") throw new Error("ffmpeg-core.js 載入唔到");
+        ffmpeg = await self.createFFmpegCore({ mainScriptUrlOrBlob: data.coreURL + "#" + btoa(JSON.stringify({ wasmURL: data.wasmURL, workerURL: "" })) });
+        ffmpeg.setLogger(d => post({ type: "LOG", data: d }));
+        ffmpeg.setProgress(d => post({ type: "PROGRESS", data: d }));
+        break; }
+      case "EXEC": ffmpeg.setTimeout(-1); ffmpeg.exec(...data.args); r = ffmpeg.ret; ffmpeg.reset(); break;
+      case "WRITE_FILE": ffmpeg.FS.writeFile(data.path, data.data); break;
+      case "READ_FILE": r = ffmpeg.FS.readFile(data.path); break;
+      case "DELETE_FILE": ffmpeg.FS.unlink(data.path); break;
+      case "CREATE_DIR": ffmpeg.FS.mkdir(data.path); break;
+      case "DELETE_DIR": ffmpeg.FS.rmdir(data.path); break;
+      case "MOUNT": { const fs = ffmpeg.FS.filesystems[data.fsType]; if (!fs) throw new Error("no " + data.fsType); ffmpeg.FS.mount(fs, data.options, data.mountPoint); break; }
+      case "UNMOUNT": ffmpeg.FS.unmount(data.mountPoint); break;
+      default: throw new Error("unknown message " + type);
+    }
+    post({ id, type, data: r }, r instanceof Uint8Array ? [r.buffer] : []);
+  } catch (e) {
+    post({ id, type: "ERROR", data: String((e && e.message) || e) });
+  }
+};`;
+class KTFFmpeg {
+  constructor() { this.h = { log: [], progress: [] }; this.cb = new Map(); this.seq = 0; this.w = null; }
+  on(e, f) { (this.h[e] = this.h[e] || []).push(f); }
+  _send(type, data, trans) {
+    if (!this.w) return Promise.reject(new Error("引擎已停止"));
+    const id = ++this.seq;
+    return new Promise((res, rej) => { this.cb.set(id, { res, rej }); this.w.postMessage({ id, type, data }, trans || []); });
+  }
+  _start() {
+    const url = URL.createObjectURL(new Blob([FF_WORKER_SRC], { type: "text/javascript" }));
+    this.w = new Worker(url);
+    this.w.onmessage = ({ data: m }) => {
+      if (m.type === "LOG") { for (const f of this.h.log) f(m.data); return; }
+      if (m.type === "PROGRESS") { for (const f of this.h.progress) f(m.data); return; }
+      const c = this.cb.get(m.id); if (!c) return; this.cb.delete(m.id);
+      m.type === "ERROR" ? c.rej(new Error(m.data)) : c.res(m.data);
+    };
+    this.w.onerror = e => { e.preventDefault && e.preventDefault(); const err = new Error(e.message || "引擎出錯"); for (const c of this.cb.values()) c.rej(err); this.cb.clear(); };
+  }
+  async load({ mirrors = FF_MIRRORS, timeoutMs = 240000, onStatus } = {}) {
+    let last;
+    for (let i = 0; i < mirrors.length; i++) {
+      this.terminate(); this._start();
+      onStatus && onStatus(i);
+      let timer;
+      try {
+        await Promise.race([
+          this._send("LOAD", { coreURL: mirrors[i] + "ffmpeg-core.js", wasmURL: mirrors[i] + "ffmpeg-core.wasm" }),
+          new Promise((_, rej) => { timer = setTimeout(() => rej(new Error("下載超時")), timeoutMs); })
+        ]);
+        clearTimeout(timer); return true;
+      } catch (e) { clearTimeout(timer); last = e; }
+    }
+    this.terminate();
+    throw last || new Error("載入失敗");
+  }
+  exec(args) { return this._send("EXEC", { args }); }
+  writeFile(path, data) { let u = data instanceof Uint8Array ? data : new Uint8Array(data); if (u.byteOffset || u.byteLength !== u.buffer.byteLength) u = u.slice(); return this._send("WRITE_FILE", { path, data: u }, [u.buffer]); }
+  readFile(path) { return this._send("READ_FILE", { path }); }
+  deleteFile(path) { return this._send("DELETE_FILE", { path }); }
+  createDir(path) { return this._send("CREATE_DIR", { path }); }
+  deleteDir(path) { return this._send("DELETE_DIR", { path }); }
+  mount(fsType, options, mountPoint) { return this._send("MOUNT", { fsType, options, mountPoint }); }
+  unmount(mountPoint) { return this._send("UNMOUNT", { mountPoint }); }
+  terminate() {
+    if (this.w) { this.w.terminate(); this.w = null; }
+    const err = new Error("引擎已停止"); for (const c of this.cb.values()) c.rej(err); this.cb.clear();
+  }
+}
 async function ffLoad() {
   if (FF.inst && FF.ready) return FF.inst;
   if (FF.loading) return FF.loading;
   engineUI("loading", "影音轉換引擎：下載緊（約 30 MB，只需第一次）…");
   FF.loading = (async () => {
-    const mod = await loadModule(LIB.ffmpeg);
-    const ff = new mod.FFmpeg();
-    ff.on("log", ({ message }) => { FF.logs.push(message); if (FF.logs.length > 400) FF.logs.shift(); FF.onLog && FF.onLog(message); });
+    if (typeof WebAssembly !== "object") throw new Error("呢部機嘅瀏覽器唔支援 WebAssembly，請更新系統");
+    const Cls = window.__ktFFmpegClass || KTFFmpeg;   // tests can swap in a stand-in
+    const ff = new Cls();
+    ff.on("log", d => { const message = d && d.message != null ? d.message : String(d); FF.logs.push(message); if (FF.logs.length > 400) FF.logs.shift(); FF.onLog && FF.onLog(message); });
     ff.on("progress", p => { FF.onProg && FF.onProg(p); });
-    // run the library's worker from a same-origin blob that imports it from the CDN
-    const classWorkerURL = URL.createObjectURL(new Blob([`import "${CDN + LIB.ffworker}";`], { type: "text/javascript" }));
-    await ff.load({ coreURL: CDN + LIB.ffcore, wasmURL: CDN + LIB.ffwasm, classWorkerURL });
+    await ff.load({ onStatus: i => { if (i > 0) engineUI("loading", "影音轉換引擎：第一個伺服器連唔到，改用後備伺服器下載緊…"); } });
     FF.inst = ff; FF.ready = true;
     engineUI("ready", "影音轉換引擎：已就緒");
     return ff;
-  })().catch(e => { FF.loading = null; FF.inst = null; engineUI("err", "影音轉換引擎載入失敗：" + (e.message || e) + "（請檢查網絡後再試）"); throw e; });
+  })().catch(e => {
+    FF.loading = null; FF.inst = null;
+    const msg = String((e && e.message) || e);
+    const hint = /超時|fetch|network|load|importScripts|NetworkError|Failed/i.test(msg)
+      ? "（可能網絡太慢或者學校網絡擋咗 cdn.jsdelivr.net / unpkg.com；可以轉用其他 Wi-Fi 或者手機熱點再試）"
+      : /memory|Memory|RangeError/.test(msg) ? "（部機記憶體唔夠，試吓閂咗其他 App / 分頁再試）" : "（請重新整理頁面再試）";
+    engineUI("err", "影音轉換引擎載入失敗：" + msg + hint);
+    throw e;
+  });
   return FF.loading;
 }
 function ffReset() { try { FF.inst && FF.inst.terminate(); } catch (e) {} FF.inst = null; FF.ready = false; FF.loading = null; engineUI("", "影音轉換引擎：已停止，下次轉換會自動重新載入"); }
@@ -5620,7 +5776,7 @@ const ADJ = [
   { id: "fade", label: "褪色（提起黑位）", min: 0, max: 100, step: 1 }
 ];
 const ZERO = Object.fromEntries(ADJ.filter(a => a.id).map(a => [a.id, 0]));
-const G = { adj: { ...ZERO }, lutSrc: "none", look: "cine", intensity: 100, order: "first", view: "wipe", split: 0.5, imgFmt: "jpg", q: 92, vidFmt: "mp4", vidQ: "high", presets: [], cubeText: null, cubeName: "", match: { on: false, tone: 90, col: 100, ref: null, refName: "", refThumb: "" } };
+const G = { adj: { ...ZERO }, lutSrc: "none", look: "cine", intensity: 100, order: "first", view: "wipe", dir: "h", split: 0.5, imgFmt: "jpg", q: 92, vidFmt: "mp4", vidQ: "high", presets: [], cubeText: null, cubeName: "", match: { on: false, tone: 90, col: 100, ref: null, refName: "", refThumb: "" } };
 try { const v = JSON.parse(localStorage.getItem(GKEY) || "null"); if (v) { const m0 = G.match; Object.assign(G, v); G.adj = { ...ZERO, ...(v.adj || {}) }; G.match = { ...m0, ...(v.match || {}) }; } } catch (e) {}
 const gsave = () => { try { localStorage.setItem(GKEY, JSON.stringify(G)); } catch (e) { try { const c = { ...G, cubeText: null }; localStorage.setItem(GKEY, JSON.stringify(c)); } catch (e2) {} } };
 
@@ -5798,13 +5954,13 @@ const VS = `#version 300 es
 in vec2 p; out vec2 uv; void main(){ uv = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
 const FS = `#version 300 es
 precision highp float; precision highp sampler3D;
-uniform sampler2D img; uniform sampler3D lut; uniform float N; uniform int mode; uniform float split; uniform int opaque;
+uniform sampler2D img; uniform sampler3D lut; uniform float N; uniform int mode; uniform float split; uniform int opaque; uniform int vert;
 in vec2 uv; out vec4 o;
 vec3 grade(vec3 c){ return texture(lut, clamp(c, 0.0, 1.0) * ((N - 1.0) / N) + 0.5 / N).rgb; }
 void main(){
   vec2 u = vec2(uv.x, 1.0 - uv.y); bool orig;
-  if (mode == 1) { orig = u.x < 0.5; u.x = fract(u.x * 2.0); }
-  else if (mode == 0) orig = u.x < split;
+  if (mode == 1) { if (vert == 1) { orig = u.y < 0.5; u.y = fract(u.y * 2.0); } else { orig = u.x < 0.5; u.x = fract(u.x * 2.0); } }
+  else if (mode == 0) orig = vert == 1 ? u.y < split : u.x < split;
   else orig = (mode == 3);
   vec4 c = texture(img, u);
   vec3 rgb = orig ? c.rgb : grade(c.rgb);
@@ -5831,8 +5987,9 @@ function makeRenderer(canvas) {
     gl, maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE),
     image(src) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tImg); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); },
     lut(data, N) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_3D, tLut); gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA16F, N, N, N, 0, gl.RGBA, gl.FLOAT, data); gl.uniform1f(U("N"), N); },
-    draw(mode, split, opaque) {
+    draw(mode, split, opaque, vert) {
       gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform1i(U("vert"), vert ? 1 : 0);
       gl.uniform1i(U("mode"), mode); gl.uniform1f(U("split"), split); gl.uniform1i(U("opaque"), opaque ? 1 : 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
@@ -5853,7 +6010,8 @@ function sizeCanvas() {
   if (!media) return;
   const k = Math.min(1, 1600 / Math.max(media.w, media.h));
   const w = Math.max(2, Math.round(media.w * k)), h = Math.max(2, Math.round(media.h * k));
-  cv.width = G.view === "sbs" ? w * 2 : w; cv.height = h;
+  const sbs = G.view === "sbs", v = G.dir === "v";
+  cv.width = sbs && !v ? w * 2 : w; cv.height = sbs && v ? h * 2 : h;
 }
 function refreshLut() { previewLut = bake(33); if (R) R.lut(previewLut, 33); lutDirty = false; }
 function render() {
@@ -5861,7 +6019,7 @@ function render() {
   if (lutDirty) refreshLut();
   if (media.kind === "video") R.image(media.el); else if (previewSrc) { R.image(previewSrc); previewSrc = null; }
   const mode = holding ? 3 : MODES[G.view];
-  R.draw(mode, G.split, false);
+  R.draw(mode, G.split, false, G.dir === "v");
   drawRefView(); placeSplit(); scheduleHist();
 }
 let raf = 0;
@@ -5869,13 +6027,25 @@ const requestRender = () => { if (!raf) raf = requestAnimationFrame(() => { raf 
 
 function placeSplit() {
   const st = $("grStage"), sp = $("grSplit"), r = cv.getBoundingClientRect(), s = st.getBoundingClientRect();
-  const show = G.view === "wipe" && !holding;
-  sp.hidden = !show;
-  if (show) { sp.style.left = (r.left - s.left + G.split * r.width) + "px"; sp.style.top = (r.top - s.top) + "px"; sp.style.height = r.height + "px"; sp.style.bottom = "auto"; sp.setAttribute("aria-valuenow", Math.round(G.split * 100)); }
-  $("grLabL").hidden = !(holding || G.view !== "after"); $("grLabR").hidden = holding || G.view === "before";
+  const show = G.view === "wipe" && !holding, v = G.dir === "v";
+  sp.hidden = !show; sp.classList.toggle("v", v); sp.setAttribute("aria-orientation", v ? "vertical" : "horizontal");
+  if (show) {
+    if (v) { sp.style.left = (r.left - s.left) + "px"; sp.style.width = r.width + "px"; sp.style.top = (r.top - s.top + G.split * r.height) + "px"; sp.style.height = ""; }
+    else { sp.style.left = (r.left - s.left + G.split * r.width) + "px"; sp.style.width = ""; sp.style.top = (r.top - s.top) + "px"; sp.style.height = r.height + "px"; }
+    sp.style.bottom = "auto"; sp.setAttribute("aria-valuenow", Math.round(G.split * 100));
+  }
+  const L = $("grLabL"), Rl = $("grLabR");
+  L.hidden = !(holding || G.view !== "after"); Rl.hidden = holding || G.view === "before";
   const refOn = G.view === "ref" && !holding, rv = $("grRefView").getBoundingClientRect();
-  $("grLabL").textContent = refOn ? "參考" : "原圖";
-  $("grLabL").style.left = ((refOn ? rv.left : r.left) - s.left + 10) + "px"; $("grLabR").style.right = (s.right - r.right + 10) + "px";
+  L.textContent = refOn ? "參考" : "原圖";
+  const top = refOn ? rv : r;
+  if (v) {
+    L.style.left = (top.left - s.left + 10) + "px"; L.style.top = (top.top - s.top + 10) + "px";
+    Rl.style.right = "auto"; Rl.style.left = (r.left - s.left + 10) + "px"; Rl.style.top = "auto"; Rl.style.bottom = (s.bottom - r.bottom + 10) + "px";
+  } else {
+    L.style.left = (top.left - s.left + 10) + "px"; L.style.top = (r.top - s.top + 10) + "px";
+    Rl.style.left = "auto"; Rl.style.right = (s.right - r.right + 10) + "px"; Rl.style.bottom = "auto"; Rl.style.top = (r.top - s.top + 10) + "px";
+  }
 }
 
 // histogram of the graded picture, worked out on the CPU from a small copy
@@ -6155,11 +6325,13 @@ document.addEventListener("keydown", e => { if ($("view-grade").hidden || e.targ
 document.addEventListener("keyup", e => { if (e.key === "\\") hold(false); });
 // dragging the split line (or tapping anywhere on the picture in split mode)
 let dragS = false;
-const setSplitFromX = x => { const r = cv.getBoundingClientRect(); G.split = c01((x - r.left) / r.width); requestRender(); };
-$("grStage").addEventListener("pointerdown", e => { if (G.view !== "wipe" || holding) return; dragS = true; $("grStage").setPointerCapture(e.pointerId); setSplitFromX(e.clientX); });
-$("grStage").addEventListener("pointermove", e => { if (dragS) setSplitFromX(e.clientX); });
+const setSplitFrom = e => { const r = cv.getBoundingClientRect(); G.split = G.dir === "v" ? c01((e.clientY - r.top) / r.height) : c01((e.clientX - r.left) / r.width); requestRender(); };
+$("grStage").addEventListener("pointerdown", e => { if (G.view !== "wipe" || holding) return; dragS = true; $("grStage").setPointerCapture(e.pointerId); setSplitFrom(e); });
+$("grStage").addEventListener("pointermove", e => { if (dragS) setSplitFrom(e); });
 ["pointerup", "pointercancel"].forEach(ev => $("grStage").addEventListener(ev, () => { if (dragS) { dragS = false; gsave(); } }));
-$("grSplit").addEventListener("keydown", e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); G.split = c01(G.split + (e.key === "ArrowLeft" ? -0.02 : 0.02)); requestRender(); gsave(); } });
+$("grSplit").addEventListener("keydown", e => { const d = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key]; if (d) { e.preventDefault(); G.split = c01(G.split + d * 0.02); requestRender(); gsave(); } });
+function renderDir() { const v = G.dir === "v", b = $("grDir"); b.setAttribute("aria-pressed", v ? "true" : "false"); b.querySelector("span").textContent = v ? "上下" : "左右"; b.querySelector("i").textContent = v ? "⇅" : "⇆"; $("grSplit").querySelector(".gr-knob").textContent = v ? "⇅" : "⇆"; $("grStage").classList.toggle("vert", v); }
+$("grDir").onclick = () => { G.dir = G.dir === "v" ? "h" : "v"; renderDir(); sizeCanvas(); requestRender(); gsave(); };
 window.addEventListener("resize", () => media && requestRender());
 $("grPlay").onclick = () => { if (!media || media.kind !== "video") return; media.el.paused ? media.el.play().catch(() => {}) : media.el.pause(); };
 $("grSeek").oninput = e => { if (!media || media.kind !== "video") return; seeking = true; media.el.currentTime = e.target.value / 1000 * (media.el.duration || 0); };
@@ -6206,6 +6378,8 @@ for (const [id, key] of [["grImgFmt", "imgFmt"], ["grVidFmt", "vidFmt"], ["grVid
 $("grQ").value = G.q; $("grQOut").textContent = G.q + "%"; $("grQRow").hidden = G.imgFmt === "png";
 $("grQ").oninput = e => { G.q = +e.target.value; $("grQOut").textContent = G.q + "%"; }; $("grQ").onchange = gsave;
 setSegG("grViewSeg", G.view);
+if (G.dir !== "v") G.dir = "h";
+renderDir();
 document.addEventListener("kt:view", e => { if (e.detail !== "view-grade" && media && media.kind === "video") media.el.pause(); if (e.detail === "view-grade" && media) requestRender(); });
 // ---------- reference material ----------
 let refCanvas = null;
@@ -6264,7 +6438,8 @@ function drawRefView() {
   rv.hidden = !on; $("grStage").classList.toggle("refmode", !!on);
   if (!on) return;
   const im = refImage(), iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height;
-  rv.height = cv.height; rv.width = Math.round(cv.height * iw / ih);
+  if (G.dir === "v") { rv.width = cv.width; rv.height = Math.round(cv.width * ih / iw); }
+  else { rv.height = cv.height; rv.width = Math.round(cv.height * iw / ih); }
   rv.getContext("2d").drawImage(im, 0, 0, rv.width, rv.height);
 }
 function renderMatch() {
